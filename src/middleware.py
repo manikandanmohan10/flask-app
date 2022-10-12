@@ -22,7 +22,7 @@ class SimpleMiddleWare(object):
                     payload = decode_token(token)
                 environ['payload'] = payload
             return self.app(environ, start_response)
-        except ExpiredSignatureError as e: 
+        except ExpiredSignatureError as e:
             res = Response("Token expired", mimetype="application/json", status=401)
             return res(environ, start_response) 
 

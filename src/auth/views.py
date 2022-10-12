@@ -1,4 +1,3 @@
-import json
 from flask import jsonify, request, Response
 from flask.views import MethodView
 from psycopg2 import IntegrityError
@@ -7,11 +6,7 @@ from src.database.auth_reg_model import User
 from src.database import db
 from http import HTTPStatus
 from sqlalchemy.exc import IntegrityError
-from jwt.api_jwt import PyJWT
-from src.auth.utils import token_required
 from flask_jwt_extended import create_access_token, create_refresh_token
-from flask_jwt_extended.tokens import _decode_jwt
-from flask_jwt_extended import get_current_user, jwt_required
 from flask_jwt_extended import decode_token
 
 

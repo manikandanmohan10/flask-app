@@ -2,16 +2,11 @@ from flask import Flask, jsonify
 from flask_migrate import Migrate
 from src.database import db
 from src.auth.bp import APIBlueprint
-from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
-from flask_apispec.extension import FlaskApiSpec
 from flask_swagger import swagger 
 from src.auth.views import RegisterAPI
 from src.database.auth_reg_model import User
 from flask_jwt_extended.jwt_manager import JWTManager
-from flask_http_middleware import MiddlewareManager
 from src.middleware import SimpleMiddleWare
-
 
 
 class APIBlueprintRegister(Flask):

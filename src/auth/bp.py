@@ -1,6 +1,6 @@
 from crypt import methods
 from flask import Blueprint
-from .views import RegisterAPI, LoginAPI, TokenCheckAPI, GetAccessTokenAPI
+from src.auth.views import RegisterAPI, LoginAPI, TokenCheckAPI, GetAccessTokenAPI
 
 class APIBlueprint(Blueprint):
     def __init__(self):
