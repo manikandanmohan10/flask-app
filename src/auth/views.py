@@ -55,10 +55,10 @@ class LoginAPI(MethodView):
                 refresh_token = create_refresh_token(identity=email)
                 access_token = create_access_token(identity=email)
                 response_data = dict(
-                    message = 'Login verfied successfully',
-                    status = 'success',
-                    statusCode = 200,
-                    token = dict(
+                    message='Login verified successfully',
+                    status='success',
+                    statusCode=200,
+                    token=dict(
                         refresh_token=refresh_token,
                         access_token=access_token,
                     )
