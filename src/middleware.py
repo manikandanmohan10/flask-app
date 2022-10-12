@@ -1,8 +1,10 @@
 from os import access
 from flask import Flask, jsonify, request, Response
 from werkzeug.wrappers import Request
-from jwt import decode
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import decode_token
+from jwt.exceptions import ExpiredSignatureError
+import src
+app = src
 
 
 class SimpleMiddleWare(object):
@@ -13,12 +15,15 @@ class SimpleMiddleWare(object):
         self.app = app
     def __call__(self, environ, start_response):
         req = Request(environ)
-        if 'Authorization' in req.headers:
-            token = req.headers.get('Authorization').split(' ')[1]
-        print('something you want done in every http request')
-        a = 10
-        if a == 10:
-            res = Response(u'Authorization failed', mimetype='text/plain',
-                       status=401)
-            return res(environ, start_response)
-        return self.app(environ, start_response)
+        try:
+            if 'Authorization' in req.headers:
+                token = req.headers.get('Authorization').split(' ')[1]
+                with app.create_app().app_context():
+                    payload = decode_token(token)
+                environ['payload'] = payload
+            return self.app(environ, start_response)
+        except ExpiredSignatureError as e: 
+            res = Response("Token expired", mimetype="application/json", status=401)
+            return res(environ, start_response) 
+
+        

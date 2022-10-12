@@ -1,3 +1,4 @@
+import json
 from flask import jsonify, request, Response
 from flask.views import MethodView
 from psycopg2 import IntegrityError
@@ -10,9 +11,8 @@ from jwt.api_jwt import PyJWT
 from src.auth.utils import token_required
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended.tokens import _decode_jwt
-from flask_jwt_extended import get_current_user,JWTManager
-from jwt import decode
-JWTManager.decode_key_loader
+from flask_jwt_extended import get_current_user, jwt_required
+from flask_jwt_extended import decode_token
 
 
 class RegisterAPI(MethodView):
@@ -59,7 +59,7 @@ class LoginAPI(MethodView):
                     status = 'success',
                     statusCode = 200,
                     token = dict(
-                        reaccess_token=refresh_token,
+                        refresh_token=refresh_token,
                         access_token=access_token,
                     )
                 )
@@ -68,3 +68,37 @@ class LoginAPI(MethodView):
                 return jsonify("Email and password are not matching"), HTTPStatus.BAD_REQUEST
         except Exception as e:
             pass
+
+    
+class TokenCheckAPI(MethodView):
+    def get(self):
+        payload = request.environ['payload']
+        user = User.query.filter_by(email=payload.get('sub')).first()
+        if user:
+            return jsonify('User verified successfully'), HTTPStatus.OK
+        else:
+            return jsonify('User Not Found'), HTTPStatus.BAD_REQUEST
+
+
+class GetAccessTokenAPI(MethodView):
+    def get(self):
+        try:
+            refresh_token = request.args['token']
+            payload = decode_token(refresh_token)
+            user = User.query.filter_by(email=payload.get('sub')).first()
+            if user:
+                access_token = create_access_token(identity=user.email)
+                response_data = {
+                    'statusCode': 200,
+                    'status': "success",
+                    'message': "Access Token Generated Successfully",
+                    'token': {
+                        'access': access_token
+                        }
+                    }
+                return jsonify(response_data), HTTPStatus.OK
+            else:
+                return jsonify('User Not found'), HTTPStatus.BAD_REQUEST
+
+        except Exception as e:
+            return jsonify(str(e)), HTTPStatus.BAD_REQUEST
