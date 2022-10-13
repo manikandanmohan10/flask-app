@@ -7,12 +7,15 @@ from src.database import db
 class AddQuoteAPI(MethodView):
     def post(self):
         try:
-            data = request.json
-            quote = data.get('quote', '')
-            mov_or_ser = data.get('mov/series_name', '')
-            quote = Quote(quote=quote, movie_or_series=mov_or_ser)
-            db.session.add(quote)
-            db.session.commit()
-            return jsonify('Created Successfully'), status.OK
+            if request.environ.get('payload'):
+                data = request.json
+                quote = data.get('quote', '')
+                mov_or_ser = data.get('mov/series_name', '')
+                quote = Quote(quote=quote, movie_or_series=mov_or_ser)
+                db.session.add(quote)
+                db.session.commit()
+                return jsonify('Created Successfully'), status.OK
+            else:
+                return jsonify('Authentication Required'), status.UNAUTHORIZED
         except Exception as e:
             return jsonify(str(e)), status.BAD_REQUEST
