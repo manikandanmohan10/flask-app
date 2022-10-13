@@ -17,12 +17,10 @@ def send_mail(recipient_mail, content={}):
         {
             "From": {
                 "Email": sender_mail,
-                # "Name": "Manikandan"
             },
             "To": [
                 {
                     "Email": recipient_mail,
-                    # "Name": "Manikandan"
                 }
             ],
             "Subject": subject if subject else "Mail from threading",
