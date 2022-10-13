@@ -7,10 +7,7 @@ import src
 app = src
 
 
-class SimpleMiddleWare(object):
-    """
-        Simple WSGI middleware
-    """
+class CustomMiddleWare(object):
     def __init__(self, app):
         self.app = app
 

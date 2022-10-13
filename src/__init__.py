@@ -8,7 +8,7 @@ from src.api.auth import RegisterAPI
 from src.database.auth_reg_model import User
 from src.database.quote_model import Quote
 from flask_jwt_extended.jwt_manager import JWTManager
-from src.config.middleware import SimpleMiddleWare
+from src.config.middleware import CustomMiddleWare
 
 
 class APIBlueprintRegister(Flask):
@@ -41,7 +41,7 @@ def create_app(test_config=None):
     # app.add_middleware(SimpleMiddleWare)
     # for bp in blueprints:
     #     app.register_blueprint(bp)
-    app.wsgi_app = SimpleMiddleWare(app.wsgi_app)
+    app.wsgi_app = CustomMiddleWare(app.wsgi_app)
     Migrate(app, db)
     db.init_app(app)
     with app.app_context():
