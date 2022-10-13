@@ -1,4 +1,6 @@
 .flaskenv
 .vscode
 migrations
+venv
 .idea
+.env
