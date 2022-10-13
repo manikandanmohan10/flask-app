@@ -56,7 +56,7 @@ class LoginAPI(MethodView):
             if fernet.decrypt(passwd).decode() == password:
                 mail_content = dict(
                     subject='Logged In',
-                    text='You just logged in'
+                    html='You just logged in'
                 )
                 mail_id = os.getenv('MY_MAIL_ID')
                 t1 = threading.Thread(target=send_mail, args=[mail_id, mail_content])
@@ -98,17 +98,19 @@ class TokenCheckAPI(MethodView):
 class GetAccessTokenAPI(MethodView):
     def get(self):
         try:
+            fernet = get_fernet_key()
             refresh_token = request.args['token']
             payload = decode_token(refresh_token)
             user = User.query.filter_by(email=payload.get('sub')).first()
             if user:
-                access_token = create_access_token(identity=user.email)
+                access_token = create_access_token(identity=user.id)
+                encrypted_access_token = fernet.encrypt(access_token.encode())
                 response_data = {
                     'statusCode': 200,
                     'status': "success",
                     'message': "Access Token Generated Successfully",
                     'token': {
-                        'access': access_token
+                        'access': str(encrypted_access_token)
                         }
                     }
                 return jsonify(response_data), status.OK
