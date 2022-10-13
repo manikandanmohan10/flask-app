@@ -2,35 +2,35 @@ import os
 from flask import jsonify, request, Response
 from flask.views import MethodView
 from psycopg2 import IntegrityError
-from werkzeug.security import check_password_hash, generate_password_hash
 from src.database.auth_reg_model import User
 from src.database import db
-from http import HTTPStatus
+from http import HTTPStatus as status
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import decode_token
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from src.service.mail_service import send_mail
+from src.config import get_fernet_key
 import threading    
+
 
 
 class RegisterAPI(MethodView):
     def post(self):
         try:
+            fernet = get_fernet_key()
             data = request.json
             username = data.get("username")
             password = data.get("password")
             email = data.get("email")
             if len(password) < 6:
-                return Response("Password length is too short"), HTTPStatus.BAD_REQUEST
-            pw_hash = generate_password_hash(password)
-            user = User(user_name=username, password=pw_hash, email=email)
+                return Response("Password length is too short"), status.BAD_REQUEST
+            encrypted_password = fernet.encrypt(password.encode())
+            user = User(username=username, password=str(encrypted_password), email=email)
             db.session.add(user)
             db.session.commit()
             response_data = dict(message='User Created Successfully',
                                 status= 'success',
-                                statusCode= HTTPStatus.CREATED
+                                statusCode= status.CREATED
                                 )
             return jsonify(response_data), 201
         except IntegrityError as e:
@@ -38,49 +38,51 @@ class RegisterAPI(MethodView):
                                 status= 'failure',
                                 statusCode= 400
                                 )
-            return jsonify(response_data), HTTPStatus.BAD_REQUEST
+            return jsonify(response_data), status.BAD_REQUEST
         except Exception as e:
-            return jsonify(str(e)), HTTPStatus.BAD_REQUEST
+            return jsonify(str(e)), status.BAD_REQUEST
 
 
 
 class LoginAPI(MethodView):
     def post(self):
         try:
-            key = eval(os.getenv('FERNET_KEY'))
-            fernet = Fernet(key)
+            fernet = get_fernet_key()
             data = request.json
             email = data.get('email')
             password = data.get('password')
-            pw_hash = User.query.get(email).password
-            if check_password_hash(pw_hash, password):
+            user = User.query.filter_by(email=email).first()
+            passwd = eval(user.password)
+            if fernet.decrypt(passwd).decode() == password:
                 mail_content = dict(
                     subject='Logged In',
                     text='You just logged in'
                 )
-                # t1 = threading.Thread(target=send_mail, args=['manikandanmkvk.ss@gmail.com', mail_content])
-                # t1.start()
-                send_mail('manikandanmkvk.ss@gmail.com', mail_content)
+                mail_id = os.getenv('MY_MAIL_ID')
+                t1 = threading.Thread(target=send_mail, args=[mail_id, mail_content])
+                t1.start()
                 refresh_token = create_refresh_token(identity=email)
                 access_token = create_access_token(identity=email)
                 encrypted_refresh_token = fernet.encrypt(refresh_token.encode())
                 encrypted_access_token = fernet.encrypt(access_token.encode())
                 encrypted_email = fernet.encrypt(email.encode())
+                encrypted_user_id = fernet.encrypt(str(user.id).encode())
                 response_data = dict(
                     message='Login verified successfully',
                     status='success',
                     statusCode=200,
+                    user_id = str(encrypted_user_id),
                     email=str(encrypted_email),
                     token=dict(
                         refresh_token=str(encrypted_refresh_token),
                         access_token=str(encrypted_access_token),
                     )
                 )
-                return jsonify(response_data), HTTPStatus.OK
+                return jsonify(response_data), status.OK
             else:
-                return jsonify("Email and password are not matching"), HTTPStatus.BAD_REQUEST
+                return jsonify("Email and password are not matching"), status.BAD_REQUEST
         except Exception as e:
-            return jsonify(str(e)), HTTPStatus.BAD_REQUEST
+            return jsonify(str(e)), status.BAD_REQUEST
 
     
 class TokenCheckAPI(MethodView):
@@ -88,9 +90,9 @@ class TokenCheckAPI(MethodView):
         payload = request.environ['payload']
         user = User.query.filter_by(email=payload.get('sub')).first()
         if user:
-            return jsonify('User verified successfully'), HTTPStatus.OK
+            return jsonify('User verified successfully'), status.OK
         else:
-            return jsonify('User Not Found'), HTTPStatus.BAD_REQUEST
+            return jsonify('User Not Found'), status.BAD_REQUEST
 
 
 class GetAccessTokenAPI(MethodView):
@@ -109,9 +111,9 @@ class GetAccessTokenAPI(MethodView):
                         'access': access_token
                         }
                     }
-                return jsonify(response_data), HTTPStatus.OK
+                return jsonify(response_data), status.OK
             else:
-                return jsonify('User Not found'), HTTPStatus.BAD_REQUEST
+                return jsonify('User Not found'), status.BAD_REQUEST
 
         except Exception as e:
-            return jsonify(str(e)), HTTPStatus.BAD_REQUEST
+            return jsonify(str(e)), status.BAD_REQUEST
