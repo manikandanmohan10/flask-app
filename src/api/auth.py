@@ -11,7 +11,7 @@ from flask_jwt_extended import decode_token
 from src.service.mail_service import send_mail
 from src.config import get_fernet_key
 import threading    
-
+from Crypto.Cipher import AES
 
 
 class RegisterAPI(MethodView):
@@ -48,6 +48,10 @@ class LoginAPI(MethodView):
     def post(self):
         try:
             fernet = get_fernet_key()
+
+            if type(fernet) == str:
+                return jsonify(fernet), status.NOT_FOUND
+
             data = request.json
             email = data.get('email')
             password = data.get('password')
