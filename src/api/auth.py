@@ -11,7 +11,6 @@ from flask_jwt_extended import decode_token
 from src.service.mail_service import send_mail
 from src.config import get_fernet_key
 import threading    
-from Crypto.Cipher import AES
 
 
 class RegisterAPI(MethodView):
