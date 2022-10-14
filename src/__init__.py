@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -9,6 +10,8 @@ from src.database.auth_reg_model import User
 from src.database.quote_model import Quote
 from flask_jwt_extended.jwt_manager import JWTManager
 from src.config.middleware import CustomMiddleWare
+postgres_username = os.getenv('POSTGRES_USER')
+postgres_password = os.getenv('POSTGRES_PASSWORD')
 
 
 class APIBlueprintRegister(Flask):
@@ -29,7 +32,7 @@ def create_app(test_config=None):
     if test_config is None:
         app.config.from_mapping(
            SECRET_KEY='dev',
-           SQLALCHEMY_DATABASE_URI='postgresql://postgres:postgres@localhost/flask_test_db',
+           SQLALCHEMY_DATABASE_URI=f'postgresql://{postgres_username}:{postgres_password}@localhost/flask_test_db',
            SQLALCHEMY_TRACK_MODIFICATIONS=False,
            JWT_SECRET_KEY='secret',
            JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=1),
