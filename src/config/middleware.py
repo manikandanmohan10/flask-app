@@ -33,5 +33,5 @@ class CustomMiddleWare(object):
             return res(environ, start_response)
         except Exception as e:
             logging.critical(f'Exception -> {str(e)}')
-            res = Response(str(e), mimetype="application/json", status=status.INTERNAL_SERVER_ERROR)
+            res = Response(str(e), mimetype="application/json", status=status.BAD_REQUEST)
             return res(environ, start_response)
