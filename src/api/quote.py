@@ -5,12 +5,10 @@ from flask import request, jsonify
 from http import HTTPStatus as status
 from src.database import db
 
+
 class AddQuoteAPI(MethodView):
     def post(self):
         try:
-            if not request.environ.get('payload'):
-                logging.error('Authentication Required')
-                return jsonify('Authentication Required'), status.UNAUTHORIZED
             data = request.json
             quote = data.get('quote', '')
             mov_or_ser = data.get('mov/series_name', '')

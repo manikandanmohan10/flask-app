@@ -10,3 +10,11 @@ def get_fernet_key() -> Fernet:
         return fernet
     else:
         return "Encrpytion Key not found"
+
+
+#Excluded paths for Middleware
+excluded_endpoints = [
+    '/auth/v1/register/',
+    '/auth/v1/login/',
+    '/auth/v1/getAccessToken/'
+]
