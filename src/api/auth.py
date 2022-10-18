@@ -12,6 +12,7 @@ from flask_jwt_extended import decode_token
 from src.service.mail_service import send_mail
 from src.api import fernet
 from jwt.exceptions import ExpiredSignatureError
+from src.config.celery_task import my_background_task
 import logging
 
 
@@ -46,6 +47,7 @@ class RegisterAPI(MethodView):
 
 class LoginAPI(MethodView):
     def post(self):
+        my_background_task().delay(5)
         data = request.json
         email = data.get('email')
         password = data.get('password')
