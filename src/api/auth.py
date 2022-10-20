@@ -23,7 +23,7 @@ class RegisterAPI(MethodView):
             password = data.get("password")
             email = data.get("email")
             if len(password) < 6:
-                logging.error('Password length must be above 8 char')
+                logging.error('Password length must have above 8 char')
                 return Response("Password length is too short"), status.BAD_REQUEST
             encrypted_password = fernet.encrypt(password.encode())
             user = User(username=username, password=str(encrypted_password), email=email)
