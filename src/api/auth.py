@@ -80,7 +80,7 @@ class LoginAPI(MethodView):
             )
         )
         logging.info('Login verified successfully')
-        return jsonify(response_data), status.OK
+        return jsonify(response_data), status.OK 
 
     
 class TokenCheckAPI(MethodView):
