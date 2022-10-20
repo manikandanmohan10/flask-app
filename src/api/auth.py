@@ -94,7 +94,6 @@ class TokenCheckAPI(MethodView):
         return jsonify('User verified successfully'), status.OK
 
 
-
 class GetAccessTokenAPI(MethodView):
     def get(self):
         try:

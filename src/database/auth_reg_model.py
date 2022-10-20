@@ -13,6 +13,5 @@ class User(db.Model):
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.Text(), nullable=False)
 
-
     def __repr__(self) -> str:
         return f'email - {self.email}'

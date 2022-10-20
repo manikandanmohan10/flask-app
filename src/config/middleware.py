@@ -35,3 +35,4 @@ class CustomMiddleWare(object):
             logging.critical(f'Exception -> {str(e)}')
             res = Response(str(e), mimetype="application/json", status=status.BAD_REQUEST)
             return res(environ, start_response)
+
