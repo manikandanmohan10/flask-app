@@ -28,7 +28,7 @@ class CustomMiddleWare(object):
                     environ['payload'] = payload
                 return self.app(environ, start_response)
         except ExpiredSignatureError as e:
-            res = Response("Token expired", mimetype="application/json", status=status.UNAUTHORIZED)
+            res = Response("Token Expired", mimetype="application/json", status=status.UNAUTHORIZED)
             logging.info('Token Required')
             return res(environ, start_response)
         except Exception as e:

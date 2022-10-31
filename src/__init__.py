@@ -3,12 +3,12 @@ import logging
 from datetime import timedelta
 from flask import Flask, jsonify
 from flask_migrate import Migrate
-from src.database import db
+from src.models import db
 from src.blueprint import blueprints
 from flask_swagger import swagger 
-from src.api.auth import RegisterAPI
-from src.database.auth_reg_model import User
-from src.database.quote_model import Quote
+from src.models.auth_reg_model import User
+from src.models.quote_model import Quote
+from src.models.todo_model import ToDo
 from flask_jwt_extended.jwt_manager import JWTManager
 from src.config.middleware import CustomMiddleWare
 import sentry_sdk

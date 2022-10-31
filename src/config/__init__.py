@@ -16,5 +16,6 @@ def get_fernet_key() -> Fernet:
 excluded_endpoints = [
     '/auth/v1/register/',
     '/auth/v1/login/',
-    '/auth/v1/getAccessToken/'
+    '/auth/v1/getAccessToken/',
+    '/todo/'
 ]

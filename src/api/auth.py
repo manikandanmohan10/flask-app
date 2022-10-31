@@ -3,8 +3,8 @@ import threading
 from flask import jsonify, request, Response
 from flask.views import MethodView
 from psycopg2 import IntegrityError
-from src.database.auth_reg_model import User
-from src.database import db
+from src.models.auth_reg_model import User
+from src.models import db
 from http import HTTPStatus as status
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, create_refresh_token

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+    <table>
+        <tr>
+            <th>Task</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>{{task.content}}</td>
+            <td>
+                <form action="/todo/{{task.id}}/" method="delete">
+                    <input type="submit" onclick="loadDoc()" value="Delete">
+                </form>
+            </td>
+            <td>
+                <form action="/todo/{{task.id}}/" method="update">
+                    <input type="submit" value="Update">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action="/todo/" method="post">
+        <input type="text" name="value">
+        <input type="submit" value="Add Task">
+    </form>
+
+    <script>
+        let tasks = tasks
+        function loadDoc() {
+            if (tasks){
+                alert(tasks)
+            }else{
+                alert('tasks')
+            }
+        }
+
+        let fetchRes = fetch('http://127.0.0.1:5000/todo/10/?');
+        fetchRes.then(res => console.log('from fetch'))
+        
+    </script>
+
+{% endblock %}

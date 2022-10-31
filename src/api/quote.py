@@ -1,9 +1,9 @@
 import logging
-from src.database.quote_model import Quote
+from src.models.quote_model import Quote
 from flask.views import MethodView
 from flask import request, jsonify
 from http import HTTPStatus as status
-from src.database import db
+from src.models import db
 
 
 class AddQuoteAPI(MethodView):

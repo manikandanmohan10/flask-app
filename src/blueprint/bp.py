@@ -2,6 +2,7 @@ from crypt import methods
 from flask import Blueprint
 from src.api.auth import RegisterAPI, LoginAPI, TokenCheckAPI, GetAccessTokenAPI
 from src.api.quote import AddQuoteAPI
+from src.api.todo import ToDoAPI
 
 
 class AuthBlueprint(Blueprint):
@@ -17,3 +18,11 @@ class QuoteBlueprint(Blueprint):
     def __init__(self):
         super(QuoteBlueprint, self).__init__("quote", __name__, url_prefix="/quote/")
         self.add_url_rule('', view_func=AddQuoteAPI.as_view("quote"))
+
+
+class ToDoBluprint(Blueprint):
+    def __init__(self):
+        super(ToDoBluprint, self).__init__("todo", __name__, url_prefix="/todo/")
+        self.add_url_rule('', view_func=ToDoAPI.as_view("todo"))
+        # self.add_url_rule('/<id>/', view_func=ToDoAPI.as_view("todo_delete"), methods=['PATCH', 'DELETE'])
+        # self.add_url_rule('upd/<int:id>/', view_func=ToDoAPI.as_view("todo_update"))
