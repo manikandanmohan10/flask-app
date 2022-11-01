@@ -2,7 +2,9 @@ import os
 import threading
 from flask import jsonify, request, Response
 from flask.views import MethodView
+from marshmallow import ValidationError
 from psycopg2 import IntegrityError
+from yaml import serialize
 from src.models.auth_reg_model import User
 from src.models import db
 from http import HTTPStatus as status
@@ -11,14 +13,20 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import decode_token
 from src.service.mail_service import send_mail
 from src.api import fernet
+from src.serializers import auth_serializer
 from jwt.exceptions import ExpiredSignatureError
 import logging
 
 
 class RegisterAPI(MethodView):
     def post(self):
+        serializer_class = auth_serializer.RegisterSerializer()
         try:
             data = request.json
+            try:
+                serializer_class.load(data)
+            except ValidationError as e:
+                raise Exception(str(e))
             username = data.get("username")
             password = data.get("password")
             email = data.get("email")
@@ -46,7 +54,12 @@ class RegisterAPI(MethodView):
 
 class LoginAPI(MethodView):
     def post(self):
+        serializer_class = auth_serializer.LoginSerializer()
         data = request.json
+        try:
+            serializer_class.load(data)
+        except ValidationError as e:
+            raise Exception(str(e))
         email = data.get('email')
         password = data.get('password')
         user = User.query.filter_by(email=email).first()
