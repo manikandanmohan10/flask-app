@@ -19,12 +19,14 @@ import logging
 
 
 class RegisterAPI(MethodView):
+    def __init__(self):
+        self.serializer_class = auth_serializer.RegisterSerializer()
+
     def post(self):
-        serializer_class = auth_serializer.RegisterSerializer()
         try:
             data = request.json
             try:
-                serializer_class.load(data)
+                self.serializer_class.load(data)
             except ValidationError as e:
                 raise Exception(str(e))
             username = data.get("username")

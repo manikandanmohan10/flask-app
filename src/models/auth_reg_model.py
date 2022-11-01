@@ -1,6 +1,6 @@
 from src.models import db
 import uuid
-import sqlalchemy.dialects.postgresql as postgresql
+from sqlalchemy.dialects import postgresql
 
 class User(db.Model):
     # id = db.Column(db.Integer(), primary_key=True)

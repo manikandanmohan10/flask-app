@@ -10,9 +10,12 @@ class AddQuoteAPI(MethodView):
     def post(self):
         try:
             data = request.json
+            payload = request.environ.get('payload')
+            user_id = payload.get('sub')
+
             quote = data.get('quote', '')
             mov_or_ser = data.get('mov/series_name', '')
-            quote = Quote(quote=quote, movie_or_series=mov_or_ser)
+            quote = Quote(quote=quote, movie_or_series=mov_or_ser, user_id=user_id)
             db.session.add(quote)
             db.session.commit()
             logging.info('created successfully')
