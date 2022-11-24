@@ -1,0 +1,7 @@
+* {
+    padding: 3px;
+}
+
+.uname, .password{
+    font-weight: bold;
+}

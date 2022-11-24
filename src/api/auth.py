@@ -1,6 +1,6 @@
 import os
 import threading
-from flask import jsonify, request, Response
+from flask import jsonify, render_template, request, Response
 from flask.views import MethodView
 from marshmallow import ValidationError
 from psycopg2 import IntegrityError
@@ -15,6 +15,7 @@ from src.service.mail_service import send_mail
 from src.api import fernet
 from src.serializers import auth_serializer
 from jwt.exceptions import ExpiredSignatureError
+from zerobounce import ZeroBounceAPI
 import logging
 
 
@@ -23,6 +24,55 @@ class RegisterAPI(MethodView):
         self.serializer_class = auth_serializer.RegisterSerializer()
 
     def post(self):
+        """
+        Create a new user
+        ---
+        tags:
+          - users
+        definitions:
+          - schema:
+              id: Group
+              properties:
+                name:
+                 type: string
+                 description: the group's name
+        parameters:
+          - in: body
+            name: body
+            schema:
+              id: User
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  description: email for user
+                name:
+                  type: string
+                  description: name for user
+                address:
+                  description: address for user
+                  schema:
+                    id: Address
+                    properties:
+                      street:
+                        type: string
+                      state:
+                        type: string
+                      country:
+                        type: string
+                      postalcode:
+                        type: string
+                groups:
+                  type: array
+                  description: list of groups
+                  items:
+                    $ref: "#/definitions/Group"
+        responses:
+          201:
+            description: User created
+        """
         try:
             data = request.json
             try:
@@ -39,10 +89,11 @@ class RegisterAPI(MethodView):
             user = User(username=username, password=str(encrypted_password), email=email)
             db.session.add(user)
             db.session.commit()
-            response_data = dict(message='User Created Successfully',
-                                 status='success',
-                                 statusCode=status.CREATED
-                                 )
+            response_data = dict(
+                message='User Created Successfully',
+                status='success',
+                statusCode=status.CREATED
+            )
             logging.info('Registered successfully')
             return jsonify(response_data), 201
         except IntegrityError as e:
@@ -53,9 +104,12 @@ class RegisterAPI(MethodView):
             logging.error('Email already exists')
             return jsonify(response_data), status.BAD_REQUEST
 
+    def get(self):
+        return render_template("login.html")
 
 class LoginAPI(MethodView):
     def post(self):
+        
         serializer_class = auth_serializer.LoginSerializer()
         data = request.json
         try:
@@ -69,7 +123,7 @@ class LoginAPI(MethodView):
             raise Exception('user not found')
         passwd = eval(user.password)
         if not fernet.decrypt(passwd).decode() == password:
-            raise Exception("Email and password are not matching")
+            raise Exception("Invalid Credentials")
         mail_content = dict(
             subject='Logged In',
             html='You just logged in'

@@ -17,15 +17,15 @@ class CustomMiddleWare(object):
         try:
             app = src.create_app()
             with app.app_context():
-                if request.path not in excluded_endpoints:
-                    tok = request.headers.get('Authorization', False)
-                    if not tok:
-                        res = Response("Token Required", mimetype="application/json", status=status.BAD_REQUEST)
-                        logging.info('Token Required')
-                        return res(environ, start_response)
-                    tok = tok.split(' ')[1]
-                    payload = decode_token(tok)
-                    environ['payload'] = payload
+                # if request.path not in excluded_endpoints:
+                #     tok = request.headers.get('Authorization', False)
+                #     if not tok:
+                #         res = Response("Token Required", mimetype="application/json", status=status.BAD_REQUEST)
+                #         logging.info('Token Required')
+                #         return res(environ, start_response)
+                #     tok = tok.split(' ')[1]
+                #     payload = decode_token(tok)
+                #     environ['payload'] = payload
                 return self.app(environ, start_response)
         except ExpiredSignatureError as e:
             res = Response("Token Expired", mimetype="application/json", status=status.UNAUTHORIZED)

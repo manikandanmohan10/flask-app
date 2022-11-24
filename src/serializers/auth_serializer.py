@@ -8,7 +8,7 @@
 #     password = db.Column(db.String(255))
 #     email = db.Column(db.Text())
 
-from marshmallow import fields, Schema, validate
+from marshmallow import fields, Schema, validate 
 
 class RegisterSerializer(Schema):
     username = fields.Str(validate=validate.Length(min=1), required=True)

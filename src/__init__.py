@@ -14,10 +14,9 @@ from src.config.middleware import CustomMiddleWare
 import sentry_sdk
 from flask import Flask
 from sentry_sdk.integrations.flask import FlaskIntegration
-# from raven.contrib.flask import Sentry
-# sentry = Sentry(
-#     dsn=os.getenv('SENTRY_URL')
-#     )
+from flasgger import Swagger
+
+
 postgres_username = os.getenv('POSTGRES_USER')
 postgres_password = os.getenv('POSTGRES_PASSWORD')
 
@@ -25,18 +24,6 @@ debug_mode = True if os.getenv('DEBUG_MODE') == '1' else False
 
 if debug_mode:
     logging.basicConfig(level=logging.DEBUG)
-
-
-# class APIBlueprintRegister(Flask):
-#     def __init__(self):
-#         super(APIBlueprintRegister, self).__init__(__name__)
-#         for bp in blueprints:
-#             self.register_blueprint(bp())
-
-#     class ContextTask(celery.Task):
-#         def __call__(self, *args, **kwargs):
-#             with app.app_context():
-#                 return self.run(*args, **kwargs)
 
 #     celery.Task = ContextTask
 #     return celery
@@ -48,8 +35,7 @@ def create_app(test_config=None):
     app = Flask(__name__,
                 instance_relative_config=True
                 )
-    swag = swagger(app)
-    # app = APIBlueprintRegister()
+    
     JWTManager(app)
     # celery = make_celery(app)
     # sentry.init_app(app)
@@ -64,11 +50,11 @@ def create_app(test_config=None):
         )  
     else:
         app.config.from_mapping(test_config)
-    # app.wsgi_app = MiddlewareManager(app)
-    # app.add_middleware(SimpleMiddleWare)
     for bp in blueprints:
         app.register_blueprint(bp)
-    
+        
+    Swagger(app)
+            
     app.wsgi_app = CustomMiddleWare(app.wsgi_app)
     Migrate(app, db)
     db.init_app(app)
@@ -76,19 +62,4 @@ def create_app(test_config=None):
         db.create_all()
 
     return app
-
-# app = create_app()
-
-# @app.errorhandler(InternalServerError)
-# def process_exception(app, exception):
-#     a = 10
-#     return app
-
-# # @app.after_request
-# # def process_exception(response):
-# #     a = 10
-# #     return response
-
-# if __name__ == '__main__':
-#     app.run('0.0.0.0', '5000', debug=debug_mode)
 

@@ -3,6 +3,8 @@ from flask import Blueprint
 from src.api.auth import RegisterAPI, LoginAPI, TokenCheckAPI, GetAccessTokenAPI
 from src.api.quote import AddQuoteAPI
 from src.api.todo import ToDoAPI
+from src.api.content import ContentManagement
+from src.api.wtf_form import WTFFormAPI
 
 
 class AuthBlueprint(Blueprint):
@@ -26,3 +28,12 @@ class ToDoBluprint(Blueprint):
         self.add_url_rule('', view_func=ToDoAPI.as_view("todo"))
         # self.add_url_rule('/<id>/', view_func=ToDoAPI.as_view("todo_delete"), methods=['PATCH', 'DELETE'])
         # self.add_url_rule('upd/<int:id>/', view_func=ToDoAPI.as_view("todo_update"))
+        
+        
+class WTFFormBlueprint(Blueprint):
+    def __init__(self):
+        super().__init__('wtf', __name__, url_prefix="/wtf")
+        self.add_url_rule('/', view_func=WTFFormAPI.as_view("wtf"))
+        # self.add_url_rule('/post/', view_func=WTFFormAPI.as_view("wtf_post"), methods=['POST'])
+        
+        

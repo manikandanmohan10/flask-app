@@ -14,6 +14,7 @@ def get_fernet_key() -> Fernet:
 
 #Excluded paths for Middleware
 excluded_endpoints = [
+    '/wtf/',
     '/auth/v1/register/',
     '/auth/v1/login/',
     '/auth/v1/getAccessToken/',
