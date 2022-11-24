@@ -28,38 +28,37 @@ if debug_mode:
 #     celery.Task = ContextTask
 #     return celery
 
-def create_app(test_config=None):
+# def create_app(test_config=None):
     # sentry_sdk.init(
     # dsn=os.getenv('SENTRY_URL'), integrations=[FlaskIntegration()]
     # )
-    app = Flask(__name__,
-                instance_relative_config=True
-                )
+app = Flask(__name__, instance_relative_config=True)
     
-    JWTManager(app)
-    # celery = make_celery(app)
-    # sentry.init_app(app)
-    if test_config is None:
-        app.config.from_mapping(
-           SECRET_KEY='dev',
-           SQLALCHEMY_DATABASE_URI=f'postgresql://{postgres_username}:{postgres_password}@localhost/flask_test_db',
-           SQLALCHEMY_TRACK_MODIFICATIONS=False,
-           JWT_SECRET_KEY='secret',
-           JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=1),
-           JWT_REFRESH_TOKEN_EXPIRES=timedelta(hours=5)
-        )  
-    else:
-        app.config.from_mapping(test_config)
-    for bp in blueprints:
-        app.register_blueprint(bp)
+JWTManager(app)
+# celery = make_celery(app)
+# sentry.init_app(app)
+test_config = None
+if test_config is None:
+    app.config.from_mapping(
+        SECRET_KEY='dev',
+        SQLALCHEMY_DATABASE_URI=f'postgresql://{postgres_username}:{postgres_password}@localhost/flask_test_db',
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        JWT_SECRET_KEY='secret',
+        JWT_ACCESS_TOKEN_EXPIRES=timedelta(hours=1),
+        JWT_REFRESH_TOKEN_EXPIRES=timedelta(hours=5)
+    )  
+else:
+    app.config.from_mapping(test_config)
+for bp in blueprints:
+    app.register_blueprint(bp)
+    
+Swagger(app)
         
-    Swagger(app)
-            
-    app.wsgi_app = CustomMiddleWare(app.wsgi_app)
-    Migrate(app, db)
-    db.init_app(app)
-    with app.app_context():
-        db.create_all()
+app.wsgi_app = CustomMiddleWare(app.wsgi_app)
+Migrate(app, db)
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
-    return app
+# return app
 
