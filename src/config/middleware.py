@@ -5,7 +5,7 @@ from jwt.exceptions import ExpiredSignatureError
 from src.config import excluded_endpoints
 from http import HTTPStatus as status
 import logging
-import src
+import app as app
 
 
 class CustomMiddleWare(object):
@@ -15,7 +15,7 @@ class CustomMiddleWare(object):
     def __call__(self, environ, start_response):
         request = Request(environ)
         try:
-            app = src.create_app()
+            app = app.create_app()
             with app.app_context():
                 # if request.path not in excluded_endpoints:
                 #     tok = request.headers.get('Authorization', False)
